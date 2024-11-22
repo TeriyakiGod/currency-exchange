@@ -1,6 +1,8 @@
 from rest_framework.test import APITestCase, APIClient
+from django.contrib.auth.models import User
 from ..models import Currency, ExchangeRate
-import random
+from typing import List
+from django.utils import timezone
 
 
 class TestCurrencyExchangeSetup(APITestCase):
@@ -8,41 +10,45 @@ class TestCurrencyExchangeSetup(APITestCase):
         # Create a test client
         self.client = APIClient()
 
-        # Seed for reproducibility
-        random.seed(42)
+        # Create a superuser
+        self.superuser_username = "content_tester"
+        self.superuser_password = "goldenstandard"
+        self.superuser_email = "test@example.com"
+        self.superuser = User.objects.create_superuser(
+            self.superuser_username, self.superuser_email, self.superuser_password
+        )
 
         # Create test currencies
-        self.usd = Currency.objects.create(code="USD", name="United States Dollar")
-        self.eur = Currency.objects.create(code="EUR", name="Euro")
-        self.jpy = Currency.objects.create(code="JPY", name="Japanese Yen")
-        self.pln = Currency.objects.create(code="PLN", name="Polish Zloty")
+        Currency.objects.create(code="USD")
+        Currency.objects.create(code="EUR")
+        Currency.objects.create(code="JPY")
+        Currency.objects.create(code="PLN")
 
         self.currencies = Currency.objects.all()
-
-        # Create exchange rates
-        self.create_exchange_rates()
-
-        # Prepare expected responses
         self.get_currency_expected_response = [
             {"code": currency.code} for currency in self.currencies
         ]
 
+        # Create test exchange rates
+        self.exchange_rates: List[ExchangeRate] = []
+        self.test_rate = 1.0
+        self.test_date = timezone.now()
+        for currency in self.currencies:
+            for target_currency in self.currencies:
+                if currency != target_currency:
+                    self.exchange_rates.append(
+                        ExchangeRate.objects.create(
+                            base_currency=currency,
+                            target_currency=target_currency,
+                            rate=self.test_rate,
+                            date=self.test_date,
+                        )
+                    )
+
         self.get_exchange_rate_expected_responses = [
             {
                 "currency_pair": f"{exchange_rate.base_currency.code}{exchange_rate.target_currency.code}",
-                "exchange_rate": f"{exchange_rate.rate:.2f}",
+                "rate": exchange_rate.rate,
             }
             for exchange_rate in self.exchange_rates
         ]
-
-    def create_exchange_rates(self):
-        for base_currency in self.currencies:
-            for target_currency in self.currencies:
-                if base_currency != target_currency:
-                    ExchangeRate.objects.create(
-                        base_currency=base_currency,
-                        target_currency=target_currency,
-                        rate=random.uniform(0.5, 1.5),  # Realistic range
-                        date="2021-01-01",
-                    )
-        self.exchange_rates = ExchangeRate.objects.all()

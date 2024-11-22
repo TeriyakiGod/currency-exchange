@@ -8,7 +8,6 @@ class TestCurrencyExchangeModels(TestCurrencyExchangeSetup):
 
         # Test attributes of a single currency
         usd = Currency.objects.get(code="USD")
-        self.assertEqual(usd.name, "United States Dollar")
         self.assertEqual(usd.code, "USD")
 
     def test_currency_get_rates(self):

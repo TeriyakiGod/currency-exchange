@@ -1,4 +1,5 @@
 from .test_setup import TestCurrencyExchangeSetup
+from ..models import Currency, ExchangeRate
 
 
 class TestCurrencyExchangeViews(TestCurrencyExchangeSetup):
