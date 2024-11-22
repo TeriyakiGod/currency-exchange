@@ -10,7 +10,7 @@ class ExchangeRateAdmin(admin.ModelAdmin):
     change_list_template = "admin/exchangerate_changelist.html"
     list_display = [
         "currency_pair",
-        "rate",
+        "exchange_rate",
         "datetime",
     ]
     readonly_fields = ["datetime"]
@@ -61,7 +61,7 @@ class ExchangeRateAdmin(admin.ModelAdmin):
                     ExchangeRate.objects.create(
                         base_currency=base_currency,
                         target_currency=target_currency,
-                        rate=current_exchange_rate,
+                        exchange_rate=current_exchange_rate,
                     )
         self.message_user(request, "Exchange rates updated")
         return redirect("..")

@@ -24,7 +24,7 @@ class TestCurrencyExchangeSetup(APITestCase):
         Currency.objects.create(code="JPY")
         Currency.objects.create(code="PLN")
 
-        self.currencies = Currency.objects.all()
+        self.currencies = Currency.objects.all().order_by("code")
         self.get_currency_expected_response = [
             {"code": currency.code} for currency in self.currencies
         ]
@@ -40,15 +40,15 @@ class TestCurrencyExchangeSetup(APITestCase):
                         ExchangeRate.objects.create(
                             base_currency=currency,
                             target_currency=target_currency,
-                            rate=self.test_rate,
-                            date=self.test_date,
+                            exchange_rate=self.test_rate,
+                            datetime=self.test_date,
                         )
                     )
 
         self.get_exchange_rate_expected_responses = [
             {
                 "currency_pair": f"{exchange_rate.base_currency.code}{exchange_rate.target_currency.code}",
-                "rate": exchange_rate.rate,
+                "exchange_rate": exchange_rate.exchange_rate,
             }
             for exchange_rate in self.exchange_rates
         ]

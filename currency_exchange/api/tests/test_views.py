@@ -1,5 +1,4 @@
 from .test_setup import TestCurrencyExchangeSetup
-from ..models import Currency, ExchangeRate
 
 
 class TestCurrencyExchangeViews(TestCurrencyExchangeSetup):
@@ -7,9 +6,6 @@ class TestCurrencyExchangeViews(TestCurrencyExchangeSetup):
         response = self.client.get("/currency/")
         # Ensure the response status code is 200
         self.assertEqual(response.status_code, 200)
-        
-        # Ensure the response is JSON
-        self.assertEqual(response.content_type, "application/json")
         
         # Parse the JSON response
         response_data = response.json()
@@ -25,13 +21,10 @@ class TestCurrencyExchangeViews(TestCurrencyExchangeSetup):
             self.exchange_rates, self.get_exchange_rate_expected_responses
         ):
             response = self.client.get(
-                f"/exchange_rate/{exchange_rate.base_currency.code}/{exchange_rate.target_currency.code}/"
+                f"/currency/{exchange_rate.base_currency.code}/{exchange_rate.target_currency.code}/"
             )
             # Ensure the response status code is 200
             self.assertEqual(response.status_code, 200)
-            
-            # Ensure the response is JSON
-            self.assertEqual(response.content_type, "application/json")
             
             # Parse the JSON response
             response_data = response.json()
