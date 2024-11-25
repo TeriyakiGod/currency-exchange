@@ -1746,6 +1746,20 @@ files = [
 ]
 
 [[package]]
+name = "whitenoise"
+version = "6.8.2"
+description = "Radically simplified static file serving for WSGI applications"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "whitenoise-6.8.2-py3-none-any.whl", hash = "sha256:df12dce147a043d1956d81d288c6f0044147c6d2ab9726e5772ac50fb45d2280"},
+    {file = "whitenoise-6.8.2.tar.gz", hash = "sha256:486bd7267a375fa9650b136daaec156ac572971acc8bf99add90817a530dd1d4"},
+]
+
+[package.extras]
+brotli = ["brotli"]
+
+[[package]]
 name = "yfinance"
 version = "0.2.50"
 description = "Download market data from Yahoo! Finance API"
@@ -1776,4 +1790,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "8cfeb357cab87dc4a11d27907fc91eaf6da8b649f4ff86be76b221d2e0206a07"
+content-hash = "cf1bc07221e6f5c9b2877769cb4c5328b8ec56da05b7c9c1ca1103afbfe3ac6e"
