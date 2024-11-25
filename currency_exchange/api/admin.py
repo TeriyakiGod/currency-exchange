@@ -56,6 +56,7 @@ class ExchangeRateAdmin(admin.ModelAdmin):
                         self.message_user(
                             request,
                             f"Failed to fetch exchange rate for {base_currency.code}{target_currency.code}",
+                            level="error",
                         )
                         continue
                     ExchangeRate.objects.create(

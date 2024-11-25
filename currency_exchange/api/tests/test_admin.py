@@ -13,9 +13,9 @@ class ExchangeRateModelAdminTests(TestCurrencyExchangeSetup):
         self.assertEqual(ExchangeRate.objects.count(), 0)
         self.assertEqual(Currency.objects.count(), 4)
         # Login as superuser
-        self.client.login(username=self.superuser_username, password=self.superuser_password)
+        self.apiclient.login(username=self.superuser_username, password=self.superuser_password)
         # Call the update_exchange_rates
-        response = self.client.get('/admin/api/exchangerate/update/')
+        response = self.apiclient.get('/admin/api/exchangerate/update/')
         self.assertEqual(response.status_code, 302)
         # Check if exchange rates were created
         self.assertEqual(ExchangeRate.objects.count(), 12)

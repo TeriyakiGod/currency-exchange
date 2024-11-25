@@ -8,7 +8,7 @@ from django.utils import timezone
 class TestCurrencyExchangeSetup(APITestCase):
     def setUp(self):
         # Create a test client
-        self.client = APIClient()
+        self.apiclient = APIClient()
 
         # Create a superuser
         self.superuser_username = "content_tester"
@@ -47,7 +47,7 @@ class TestCurrencyExchangeSetup(APITestCase):
 
         self.get_exchange_rate_expected_responses = [
             {
-                "currency_pair": f"{exchange_rate.base_currency.code}{exchange_rate.target_currency.code}",
+                "currency_pair": str(exchange_rate),
                 "exchange_rate": exchange_rate.exchange_rate,
             }
             for exchange_rate in self.exchange_rates

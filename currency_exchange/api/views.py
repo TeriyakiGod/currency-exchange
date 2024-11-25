@@ -4,15 +4,16 @@ from rest_framework.response import Response
 from .models import Currency, ExchangeRate
 from .serializers import CurrencySerializer, ExchangeRateSerializer, ErrorSerializer
 from drf_spectacular.utils import extend_schema
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.openapi import OpenApiParameter
 
 
 def index(_):
     return redirect("swagger")
 
 
-@extend_schema(responses=CurrencySerializer(many=True))
+@extend_schema(
+    responses=CurrencySerializer(many=True),
+    description="List all currencies stored in the database",
+)
 @api_view(["GET"])
 def currency_list(request):
     currencies = Currency.objects.all().order_by("code")
@@ -21,44 +22,36 @@ def currency_list(request):
 
 
 @extend_schema(
-    parameters=[
-        OpenApiParameter(
-            name="base_currency",
-            type=OpenApiTypes.STR,
-            description="Base currency code",
-            enum=[currency.code for currency in Currency.objects.all()],
-            location=OpenApiParameter.PATH,
-        ),
-        OpenApiParameter(
-            name="target_currency",
-            type=OpenApiTypes.STR,
-            description="Target currency code",
-            enum=[currency.code for currency in Currency.objects.all()],
-            location=OpenApiParameter.PATH,
-        ),
-    ],
     responses={
         200: ExchangeRateSerializer,
         400: ErrorSerializer,
         404: ErrorSerializer,
     },
+    description="Get the latest exchange rate between two currencies",
 )
 @api_view(["GET"])
-def exchange_rate(request, base_currency, target_currency):
+def exchange_rate(request, base_currency, quote_currency):
     try:
         base_currency = Currency.objects.get(code=base_currency)
     except Currency.DoesNotExist:
-        return Response({"error": f"Currency {base_currency} not found"}, status=404)
+        serializer = ErrorSerializer({"error": f"Currency {base_currency} not found"})
+        return Response(serializer.data, status=404)
     try:
-        target_currency = Currency.objects.get(code=target_currency)
+        quote_currency = Currency.objects.get(code=quote_currency)
     except Currency.DoesNotExist:
-        return Response({"error": f"Currency {target_currency} not found"}, status=404)
-    if base_currency == target_currency:
-        return Response(
-            {"error": "Base and target currencies are the same"}, status=400
+        serializer = ErrorSerializer({"error": f"Currency {quote_currency} not found"})
+        return Response(serializer.data, status=404)
+    if base_currency == quote_currency:
+        serializer = ErrorSerializer(
+            {"error": "Base currency and quote currency cannot be the same"}
         )
-    exchange_rate = ExchangeRate.objects.filter(
-        base_currency=base_currency, target_currency=target_currency
-    ).order_by('-datetime').first()
+        return Response(serializer.data, status=400)
+    exchange_rate = (
+        ExchangeRate.objects.filter(
+            base_currency=base_currency, target_currency=quote_currency
+        )
+        .order_by("-datetime")
+        .first()
+    )
     serializer = ExchangeRateSerializer(exchange_rate)
     return Response(serializer.data)
