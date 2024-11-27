@@ -4,6 +4,15 @@ from rest_framework.response import Response
 from .models import Currency, ExchangeRate
 from .serializers import CurrencySerializer, ExchangeRateSerializer, ErrorSerializer
 from drf_spectacular.utils import extend_schema
+from django_filters import rest_framework as filters
+
+class ExchangeRateFilter(filters.FilterSet):
+    base_currency = filters.CharFilter(field_name="base_currency__code", lookup_expr="iexact")
+    target_currency = filters.CharFilter(field_name="target_currency__code", lookup_expr="iexact")
+
+    class Meta:
+        model = ExchangeRate
+        fields = ['base_currency__code', 'target_currency__code']
 
 
 def index(_):
@@ -54,4 +63,10 @@ def exchange_rate(request, base_currency, quote_currency):
         .first()
     )
     serializer = ExchangeRateSerializer(exchange_rate)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+def exchange_rate_list(request):
+    f = ExchangeRateFilter(request.GET, queryset=ExchangeRate.objects.all())
+    serializer = ExchangeRateSerializer(f.qs, many=True)
     return Response(serializer.data)
