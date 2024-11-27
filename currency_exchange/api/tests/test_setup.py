@@ -19,10 +19,10 @@ class TestCurrencyExchangeSetup(APITestCase):
         )
 
         # Create test currencies
-        Currency.objects.create(code="USD")
-        Currency.objects.create(code="EUR")
-        Currency.objects.create(code="JPY")
-        Currency.objects.create(code="PLN")
+        # Currency.objects.create(code="USD")
+        # Currency.objects.create(code="EUR")
+        # Currency.objects.create(code="JPY")
+        # Currency.objects.create(code="PLN")
 
         self.currencies = Currency.objects.all().order_by("code")
         self.get_currency_expected_response = [
@@ -30,25 +30,27 @@ class TestCurrencyExchangeSetup(APITestCase):
         ]
 
         # Create test exchange rates
-        self.exchange_rates: List[ExchangeRate] = []
-        self.test_rate = 1.0
-        self.test_date = timezone.now()
-        for currency in self.currencies:
-            for target_currency in self.currencies:
-                if currency != target_currency:
-                    self.exchange_rates.append(
-                        ExchangeRate.objects.create(
-                            base_currency=currency,
-                            target_currency=target_currency,
-                            exchange_rate=self.test_rate,
-                            datetime=self.test_date,
-                        )
-                    )
+        # self.exchange_rates: List[ExchangeRate] = []
+        # self.test_rate = 1.0
+        # self.test_date = timezone.now()
+        # for currency in self.currencies:
+        #     for target_currency in self.currencies:
+        #         if currency != target_currency:
+        #             self.exchange_rates.append(
+        #                 ExchangeRate.objects.create(
+        #                     base_currency=currency,
+        #                     target_currency=target_currency,
+        #                     exchange_rate=self.test_rate,
+        #                     datetime=self.test_date,
+        #                 )
+        #             )
+
+        self.exchange_rates = ExchangeRate.objects.all()
 
         self.get_exchange_rate_expected_responses = [
             {
                 "currency_pair": str(exchange_rate),
-                "exchange_rate": exchange_rate.exchange_rate,
+                "exchange_rate": float(exchange_rate.exchange_rate),
             }
             for exchange_rate in self.exchange_rates
         ]
